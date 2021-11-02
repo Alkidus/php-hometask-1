@@ -23,12 +23,7 @@
           <?php CreateMenu($url, $menu) ?>
         </ul>
         <ul class="nav navbar-nav w-100 justify-content-end">
-          <li class="nav-item">
-            <a <?php IsLogin($url) ?> href="index.php?page=login">Login</a>
-          </li>
-          <li class="nav-item">
-            <a <?php IsRegister($url) ?> href="index.php?page=register">Register</a>
-          </li>
+          <?php SetEmailToNavbar(); ?>
         </ul>
       </div>
     </div>

@@ -10,7 +10,7 @@
 
     <div class="form-group mt-3">
         <label for="password">Password:</label>
-        <input type="text" name="password" id="password" class="form-control">
+        <input type="password" name="password" id="password" class="form-control">
     </div>
 
     <button class="btn btn-primary mt-3" name="user">Send</button>

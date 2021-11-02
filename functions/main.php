@@ -34,18 +34,18 @@ function showMessage()
         unset($_SESSION['flash']);
     }
 }
-function IsLogin($URL)
-{
-    $isActive = 'class="nav-link active aria-current=\"page\""';
-    if ($URL == '/index.php?page=login') echo $isActive;
-    else echo 'class="nav-link"';
-}
-function IsRegister($URL)
-{
-    $isActive = 'class="nav-link active aria-current=\"page\""';
-    if ($URL == '/index.php?page=register') echo $isActive;
-    else echo 'class="nav-link"';
-}
+// function IsLogin($URL)
+// {
+//     $isActive = 'class="nav-link active aria-current=\"page\""';
+//     if ($URL == '/index.php?page=login') echo $isActive;
+//     else echo 'class="nav-link"';
+// }
+// function IsRegister($URL)
+// {
+//     $isActive = 'class="nav-link active aria-current=\"page\""';
+//     if ($URL == '/index.php?page=register') echo $isActive;
+//     else echo 'class="nav-link"';
+// }
 
 function CreateMenu($URL, $Array)
 {
@@ -58,4 +58,41 @@ function CreateMenu($URL, $Array)
             echo '<li class="nav-item"><a class="nav-link active aria-current=\"page\"" href=' . $value . '>' . $key . '</a></li>';
         else echo '<li class="nav-item"><a class="nav-link" href=' . $value . '>' . $key . '</a></li>';
     }
+}
+
+function GetEmailLogin($email)
+{
+    $_SESSION['login'] = $email;
+}
+
+function LogOut()
+{
+    $_SESSION['login'] = array();
+    session_destroy();
+}
+
+function SetEmailToNavbar()
+{
+    if (isset($_SESSION['login'])) {
+        echo '<li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            ' . $_SESSION['login'] . '
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="?is_exit=1">Logout</a></li>
+          </ul>
+        </li>';
+        if (isset($_GET["is_exit"])) {
+            if ($_GET["is_exit"] == 1) {
+                LogOut();
+                redirect('home');
+            }
+        }
+    } else
+        echo '<li class="nav-item">
+            <a class="nav-link" href="index.php?page=login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.php?page=register">Register</a>
+          </li>';
 }

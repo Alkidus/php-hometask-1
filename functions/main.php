@@ -96,3 +96,16 @@ function SetEmailToNavbar()
             <a class="nav-link" href="index.php?page=register">Register</a>
           </li>';
 }
+
+function setEmail($email)
+{
+    $_SESSION['email'] = $email;
+}
+function showEmail()
+{
+    if (isset($_SESSION['email'])) {
+        echo $_SESSION['email'];
+        unset($_SESSION['flash']);
+    } else
+        echo '';
+}

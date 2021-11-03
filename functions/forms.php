@@ -53,6 +53,7 @@ if (isset($_POST['newuser'])) {
         setMessage('All fields is required', 'danger');
     elseif ($password != $confirmPassword) :
         setMessage('Passwods does not match', 'danger');
+        setEmail($email);
     else :
         $to = 'alkiddkv@gmail.com';
         $subject = 'Login at site';

@@ -5,7 +5,7 @@
 
     <div class="form-group mt-3">
         <label for="email">Email:</label>
-        <input type="email" name="email" id="email" class="form-control">
+        <input type="email" name="email" id="email" class="form-control" value='<? showEmail() ?>'>
     </div>
 
     <div class="form-group mt-3">

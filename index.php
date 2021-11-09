@@ -21,7 +21,14 @@
       <div class="collapse navbar-collapse w-100">
         <ul class="nav navbar-nav w-100">
           <?php CreateMenu($url, $menu) ?>
+          <li class="nav-item">
+            <a class="nav-link" href="index.php?page=categories">Categories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.php?page=articles">Articles</a>
+          </li>
         </ul>
+
         <ul class="nav navbar-nav w-100 justify-content-end">
           <?php SetEmailToNavbar(); ?>
         </ul>

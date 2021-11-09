@@ -4,6 +4,7 @@ $page = $_GET['page'] ?? 'home';
 
 require_once './functions/forms.php';
 require_once './routes.php';
+require_once './functions/db.php';
 
 function clearString($str)
 {
@@ -109,3 +110,86 @@ function showEmail()
     } else
         echo '';
 }
+
+function getCategories(){
+    global $pdo;
+    $stmt = $pdo->query('SELECT * FROM categories');
+    return $stmt->fetchAll(PDO::FETCH_OBJ);
+}
+
+if(isset($_POST['add-category'])){
+    $name = clearString($_POST['name'] ?? null);
+    $description = clearString($_POST['description'] ?? null);
+    if(empty($name)){
+        setMessage('Name is required', 'danger');
+        redirect('add-category');
+    }
+    //$pdo->query('INSERT INTO categories(name, description) VALUES("'.$name.'", "'.$description.'")');
+    $stmt = $pdo->prepare('INSERT INTO categories(name, description) VALUES(?, ?)');
+    $stmt->execute([$name, $description]);
+    redirect('categories');
+}
+
+if(isset($_POST['delete-category'])){
+    $id = $_POST['id'];
+    // $pdo->query('DELETE FROM categories WHERE id=' . $id);
+    $stmt = $pdo->prepare('DELETE FROM categories WHERE id=?');
+    $stmt->execute([$id]);
+    redirect('categories');
+}
+
+function getCategory($id){
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT * FROM categories WHERE id=?');
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_OBJ);
+}
+
+if(isset($_POST['edit-category'])){
+    $name = clearString($_POST['name'] ?? null);
+    $description = clearString($_POST['description'] ?? null);
+    $id = clearString($_POST['id'] ?? null);
+    if(empty($name)){
+        setMessage('Name is required', 'danger');
+        redirect('edit-category');
+    }
+    $stmt = $pdo->prepare('UPDATE categories SET name=:n, description=:d WHERE id=:id');
+    $stmt->execute([
+        'id'=>$id,
+        'n'=>$name,
+        'd'=>$description
+    ]);
+    redirect('categories');
+
+}
+
+function getArticles(){
+    global $pdo;
+    $stmt = $pdo->query('SELECT * FROM articles');
+    return $stmt->fetchAll(PDO::FETCH_OBJ);
+}
+
+if(isset($_POST['add-article'])){
+    $file = $_FILES['file'];
+    //dump($file);
+    move_uploaded_file($file['tmp_name'], 'uploads/'.$file['name']);
+}
+
+// Array
+// (
+//     [name] => 2021-09-26 (3).png
+//     [type] => image/png
+//     [tmp_name] => C:\OpenServer\userdata\temp\upload\php2746.tmp
+//     [error] => 0
+//     [size] => 198110
+// )
+
+
+// $p = mysqli_connect();
+// $result = mysqli_query($p, 'SELECT * FROM categories');
+
+// $p =  new mysqli();
+// $result = $p -> query($p, 'SELECT * FROM categories');
+
+// $p = new PDO('mysql:');
+// $result = $p -> query($p, 'SELECT * FROM categories');

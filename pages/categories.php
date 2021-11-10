@@ -1,5 +1,4 @@
 <h1 class='text-center'>Categories</h1>
-<p>hello</p>
 <!-- a.btn-primary -->
 <a href="index.php?page=add-category" class="btn btn-primary">Create new category</a>
 <?php
@@ -23,26 +22,23 @@ $categories = getCategories();
         </tr>
     </thead>
     <tbody>
-    <?php foreach($categories as $category): ?>
-        <tr>
-            <td><?= $category->id ?></td>
-            <td><?= $category->name ?></td>
-            <td><?= $category->description ?></td>
-            <td>
-            <div class="d-flex justify-contend-end">
+        <?php foreach ($categories as $category) : ?>
+            <tr>
+                <td><?= $category->id ?></td>
+                <td><?= $category->name ?></td>
+                <td><?= $category->description ?></td>
+                <td>
+                    <div class="d-flex justify-contend-end">
 
-            <a href="index.php?page=edit-category&id=<?= $category->id ?>" class="btn btn-warning me-2">Edit</a>
+                        <a href="index.php?page=edit-category&id=<?= $category->id ?>" class="btn btn-warning me-2">Edit</a>
 
-            <form action="index.php" method="post">
-            <input type="hidden" name="id" value="<?= $category->id ?>">
-            <button class="btn btn-danger" name="delete-category">Delete</button>
-            </form>
-            </div>
-            </td>
-        </tr>
+                        <form action="index.php" method="post">
+                            <input type="hidden" name="id" value="<?= $category->id ?>">
+                            <button class="btn btn-danger" name="delete-category">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
         <?php endforeach ?>
     </tbody>
 </table>
-
-
-

@@ -111,16 +111,17 @@ function showEmail()
         echo '';
 }
 
-function getCategories(){
+function getCategories()
+{
     global $pdo;
     $stmt = $pdo->query('SELECT * FROM categories');
     return $stmt->fetchAll(PDO::FETCH_OBJ);
 }
 
-if(isset($_POST['add-category'])){
+if (isset($_POST['add-category'])) {
     $name = clearString($_POST['name'] ?? null);
     $description = clearString($_POST['description'] ?? null);
-    if(empty($name)){
+    if (empty($name)) {
         setMessage('Name is required', 'danger');
         redirect('add-category');
     }
@@ -130,7 +131,7 @@ if(isset($_POST['add-category'])){
     redirect('categories');
 }
 
-if(isset($_POST['delete-category'])){
+if (isset($_POST['delete-category'])) {
     $id = $_POST['id'];
     // $pdo->query('DELETE FROM categories WHERE id=' . $id);
     $stmt = $pdo->prepare('DELETE FROM categories WHERE id=?');
@@ -138,52 +139,103 @@ if(isset($_POST['delete-category'])){
     redirect('categories');
 }
 
-function getCategory($id){
+function getCategory($id)
+{
     global $pdo;
     $stmt = $pdo->prepare('SELECT * FROM categories WHERE id=?');
     $stmt->execute([$id]);
     return $stmt->fetch(PDO::FETCH_OBJ);
 }
 
-if(isset($_POST['edit-category'])){
+// if(isset($_POST['edit-category'])){
+//     $name = clearString($_POST['name'] ?? null);
+//     $description = clearString($_POST['description'] ?? null);
+//     $id = clearString($_POST['id'] ?? null);
+//     if(empty($name)){
+//         setMessage('Name is required', 'danger');
+//         redirect('edit-category');
+//     }
+//     $stmt = $pdo->prepare('UPDATE categories SET name=:n, description=:d WHERE id=:id');
+//     $stmt->execute([
+//         'id'=>$id,
+//         'n'=>$name,
+//         'd'=>$description
+//     ]);
+//     redirect('categories');
+// }
+if (isset($_POST['edit-category'])) {
     $name = clearString($_POST['name'] ?? null);
     $description = clearString($_POST['description'] ?? null);
     $id = clearString($_POST['id'] ?? null);
-    if(empty($name)){
-        setMessage('Name is required', 'danger');
+
+    if (empty($name)) {
+        setMessage('Name is required.', 'danger');
         redirect('edit-category');
     }
+
     $stmt = $pdo->prepare('UPDATE categories SET name=:n, description=:d WHERE id=:id');
     $stmt->execute([
-        'id'=>$id,
-        'n'=>$name,
-        'd'=>$description
+        'id' => $id,
+        'n' => $name,
+        'd' => $description
     ]);
-    redirect('categories');
 
+    redirect('categories');
 }
 
-function getArticles(){
+function getArticles()
+{
     global $pdo;
     $stmt = $pdo->query('SELECT * FROM articles');
     return $stmt->fetchAll(PDO::FETCH_OBJ);
 }
 
-if(isset($_POST['add-article'])){
+if (isset($_POST['add-article'])) {
     $file = $_FILES['file'];
-    //dump($file);
-    move_uploaded_file($file['tmp_name'], 'uploads/'.$file['name']);
+    extract($file);
+
+    if ($error != 0) {
+        setMessage('File not upload!', 'danger');
+        redirect('add-article');
+    }
+
+    $allowTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!in_array($type, $allowTypes)) {
+        setMessage('File not image!', 'danger');
+        redirect('add-article');
+    }
+
+    list($width, $height) = getimagesize($tmp_name); //  [0] => 425  [1] => 280   [2] => 2
+
+    if ($width > 4000 || $height > 4000) {
+        setMessage('File too big', 'danger');
+        redirect('add-article');
+    }
+
+    $name = time() . '_' . $name;
+
+    if (!move_uploaded_file($tmp_name, 'uploads/' . $name)) {
+        setMessage('Try later', 'danger');
+        redirect('add-article');
+    }
+
+
+    $nameArticle = clearString($_POST['name'] ?? null);
+    $text = clearString($_POST['text'] ?? null);
+    $category = clearString($_POST['category'] ?? null);
+
+    if (empty($name) || empty($text)) {
+        setMessage('Name and text are required.', 'danger');
+        redirect('add-article');
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO articles(name, text, img, category_id) VALUES(?,?,?,?)');
+    $stmt->execute([$nameArticle, $text, 'uploads/' . $name,  $category == 0 ? null : $category]);
+
+    setMessage('Article with id ' . $pdo->lastInsertId() . ' added!');
+
+    redirect('articles');
 }
-
-// Array
-// (
-//     [name] => 2021-09-26 (3).png
-//     [type] => image/png
-//     [tmp_name] => C:\OpenServer\userdata\temp\upload\php2746.tmp
-//     [error] => 0
-//     [size] => 198110
-// )
-
 
 // $p = mysqli_connect();
 // $result = mysqli_query($p, 'SELECT * FROM categories');

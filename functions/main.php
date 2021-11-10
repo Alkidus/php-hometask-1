@@ -205,7 +205,7 @@ if (isset($_POST['add-article'])) {
         redirect('add-article');
     }
 
-    list($width, $height) = getimagesize($tmp_name); //  [0] => 425  [1] => 280   [2] => 2
+    list($width, $height) = getimagesize($tmp_name);
 
     if ($width > 4000 || $height > 4000) {
         setMessage('File too big', 'danger');

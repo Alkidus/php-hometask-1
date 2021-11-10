@@ -1,6 +1,6 @@
 <h1 class='text-center'>Articles</h1>
 <!-- a.btn-primary -->
-<a href="index.php?page=add-articles" class="btn btn-primary">New artecles</a>
+<a href="index.php?page=add-articles" class="btn btn-primary">New Article</a>
 <?php
 // $stmt = $pdo->query('SELECT * FROM categories');
 // $result = $stmt->fetchAll(PDO::FETCH_OBJ);

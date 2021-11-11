@@ -147,22 +147,6 @@ function getCategory($id)
     return $stmt->fetch(PDO::FETCH_OBJ);
 }
 
-// if(isset($_POST['edit-category'])){
-//     $name = clearString($_POST['name'] ?? null);
-//     $description = clearString($_POST['description'] ?? null);
-//     $id = clearString($_POST['id'] ?? null);
-//     if(empty($name)){
-//         setMessage('Name is required', 'danger');
-//         redirect('edit-category');
-//     }
-//     $stmt = $pdo->prepare('UPDATE categories SET name=:n, description=:d WHERE id=:id');
-//     $stmt->execute([
-//         'id'=>$id,
-//         'n'=>$name,
-//         'd'=>$description
-//     ]);
-//     redirect('categories');
-// }
 if (isset($_POST['edit-category'])) {
     $name = clearString($_POST['name'] ?? null);
     $description = clearString($_POST['description'] ?? null);
@@ -196,27 +180,27 @@ if (isset($_POST['add-article'])) {
 
     if ($error != 0) {
         setMessage('File not upload!', 'danger');
-        redirect('add-article');
+        redirect('add-articles');
     }
 
     $allowTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
     if (!in_array($type, $allowTypes)) {
         setMessage('File not image!', 'danger');
-        redirect('add-article');
+        redirect('add-articles');
     }
 
     list($width, $height) = getimagesize($tmp_name);
 
     if ($width > 4000 || $height > 4000) {
         setMessage('File too big', 'danger');
-        redirect('add-article');
+        redirect('add-articles');
     }
 
     $name = time() . '_' . $name;
 
     if (!move_uploaded_file($tmp_name, 'uploads/' . $name)) {
         setMessage('Try later', 'danger');
-        redirect('add-article');
+        redirect('add-articles');
     }
 
 
@@ -226,7 +210,7 @@ if (isset($_POST['add-article'])) {
 
     if (empty($name) || empty($text)) {
         setMessage('Name and text are required.', 'danger');
-        redirect('add-article');
+        redirect('add-articles');
     }
 
     $stmt = $pdo->prepare('INSERT INTO articles(name, text, img, category_id) VALUES(?,?,?,?)');
@@ -237,6 +221,83 @@ if (isset($_POST['add-article'])) {
     redirect('articles');
 }
 
+if (isset($_POST['delete-article']))  //article удаление вместе с картинкой из папки uploads
+{
+    $id = $_POST['id'];
+    $stmt = $pdo->prepare('SELECT * FROM articles WHERE id=?');
+    $stmt->execute([$id]);
+    $image = $stmt->fetch(PDO::FETCH_ASSOC);
+    extract($image);
+    $image_name = $image['img'];
+    unlink($image_name); // удаление картинки
+    $stmt = $pdo->prepare('DELETE FROM articles WHERE id=?');
+    $stmt->execute([$id]);
+    redirect('articles');
+}
+
+function getArticle($id)
+{
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT * FROM articles WHERE id=?');
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_OBJ);
+}
+if (isset($_POST['edit-article'])) {
+    $file = $_FILES['file'];
+    extract($file);
+
+    if ($error != 0) {
+        setMessage('File not upload!', 'danger');
+        redirect('edit-article');
+    }
+
+    $allowTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!in_array($type, $allowTypes)) {
+        setMessage('File not image!', 'danger');
+        redirect('edit-article');
+    }
+
+    list($width, $height) = getimagesize($tmp_name);
+
+    if ($width > 4000 || $height > 4000) {
+        setMessage('File too big', 'danger');
+        redirect('edit-article');
+    }
+
+    $name = time() . '_' . $name;
+
+    if (!move_uploaded_file($tmp_name, 'uploads/' . $name)) {
+        setMessage('Try later', 'danger');
+        redirect('edit-article');
+    }
+
+
+    $nameArticle = clearString($_POST['name'] ?? null);
+    $text = clearString($_POST['text'] ?? null);
+    $category = clearString($_POST['category'] ?? null);
+    $id = clearString($_POST['id'] ?? null);
+    $oldImage = getArticle($id);
+    unlink($oldImage->img); //удаляем старую картинку
+
+    if (empty($name) || empty($text)) {
+        setMessage('Name and text are required.', 'danger');
+        redirect('edit-article');
+    }
+
+    $stmt = $pdo->prepare('UPDATE articles SET name=:n, text=:t, img=:i, category_id =:ci WHERE id=:id');
+
+    $stmt->execute([
+        'id' => $id,
+        'n' => $nameArticle,
+        't' => $text,
+        'i' => 'uploads/' . $name,
+        'ci' => $category
+    ]);
+
+    setMessage('Article with id-' . $id . ' was edited!');
+
+    redirect('articles');
+}
 // $p = mysqli_connect();
 // $result = mysqli_query($p, 'SELECT * FROM categories');
 
